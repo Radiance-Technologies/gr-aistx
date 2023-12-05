@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2013 <+YOU OR YOUR COMPANY+>.
- * 
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- * 
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+/*
+ * Copyright 2023 gr-aistx author.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -24,25 +11,28 @@
 
 #include <gnuradio/io_signature.h>
 #include "nrz_to_nrzi_impl.h"
-#include <stdio.h>
 
 namespace gr {
-  namespace AISTX {
+  namespace aistx {
 
+    
+    using input_type = unsigned char;
+    using output_type = unsigned char;
     nrz_to_nrzi::sptr
     nrz_to_nrzi::make()
     {
-      return gnuradio::get_initial_sptr
-        (new nrz_to_nrzi_impl());
+      return gnuradio::make_block_sptr<nrz_to_nrzi_impl>(
+        );
     }
+
 
     /*
      * The private constructor
      */
     nrz_to_nrzi_impl::nrz_to_nrzi_impl()
       : gr::block("nrz_to_nrzi",
-		      gr::io_signature::make(1, 1, sizeof(unsigned char)),
-		      gr::io_signature::make(1, 1, sizeof(unsigned char)))
+              gr::io_signature::make(1 /* min inputs */, 1 /* max inputs */, sizeof(input_type)),
+              gr::io_signature::make(1 /* min outputs */, 1 /*max outputs */, sizeof(output_type)))
     {}
 
     /*
@@ -55,7 +45,7 @@ namespace gr {
     void
     nrz_to_nrzi_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+     /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
     }
 
     int
@@ -64,15 +54,16 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        const unsigned char *in = (const unsigned char *) input_items[0];
-        unsigned char *out = (unsigned char *) output_items[0];
+        auto in = static_cast<const input_type*>(input_items[0]);
+        auto out = static_cast<output_type*>(output_items[0]);
+        
         unsigned char        nrzi_bit;
         unsigned char        nrz_bit;
         unsigned char        d_prev_nrzi_bit = 0;
 
-	  	for(int i = 0;i<noutput_items;++i)
-			printf("%d", in[i]);
-	  	printf("\n");	
+        for(int i = 0;i<noutput_items;++i)
+            printf("%d", in[i]);
+        printf("\n");   
 
         for (int i = 0; i < noutput_items; i++)
         {     
@@ -91,9 +82,9 @@ namespace gr {
 
         }
 
-	  	for(int i = 0;i<noutput_items;++i)
-			printf("%d", out[i]);
-	  	printf("\n");	
+        for(int i = 0;i<noutput_items;++i)
+            printf("%d", out[i]);
+        printf("\n");   
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
@@ -103,6 +94,5 @@ namespace gr {
         return noutput_items;
     }
 
-  } /* namespace AISTX */
+  } /* namespace aistx */
 } /* namespace gr */
-
